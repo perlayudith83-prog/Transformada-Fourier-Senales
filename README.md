@@ -1,25 +1,44 @@
-# Simulación y análisis de señales con la Transformada de Fourier
+# Simulación y Análisis de Señales con la Transformada de Fourier
 
 ## Descripción
 
-Este proyecto implementa la Transformada Rápida de Fourier (FFT) en Python para analizar señales en el dominio del tiempo y de la frecuencia.
+Este proyecto implementa la Transformada Rápida de Fourier (FFT) utilizando Python para analizar diferentes señales en el dominio del tiempo y de la frecuencia.
 
-## Señales analizadas
+## Objetivos
 
-* Señal senoidal
-* Pulso rectangular
-* Función escalón
+* Generar señales básicas.
+* Aplicar la Transformada de Fourier.
+* Visualizar magnitud y fase.
+* Verificar propiedades fundamentales.
+* Interpretar resultados obtenidos.
 
 ## Herramientas utilizadas
 
-* Python
+* Python 3
 * NumPy
-* SciPy
 * Matplotlib
 
-## Objetivo
+## Señales analizadas
 
-Visualizar cómo una señal cambia al pasar del dominio temporal al dominio frecuencial y verificar propiedades fundamentales de la Transformada de Fourier.
+1. Señal senoidal
+2. Pulso rectangular
+3. Función escalón
+
+## Propiedades verificadas
+
+* Linealidad
+* Desplazamiento temporal
+* Escalamiento en frecuencia
+
+## Ejecución
+
+Instalar dependencias:
+
+pip install numpy matplotlib
+
+Ejecutar:
+
+python Fourier.py
 
 ## Autor
 
