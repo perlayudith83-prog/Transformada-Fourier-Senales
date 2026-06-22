@@ -1,168 +1,129 @@
-# ==========================================
-# SIMULACIÓN Y ANÁLISIS DE SEÑALES
-# TRANSFORMADA DE FOURIER
-# ==========================================
+# =====================================================
+# SIMULACIÓN Y ANÁLISIS DE SEÑALES CON FOURIER
+# Autor: Perla Delgadillo
+# =====================================================
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import signal
 
 # ------------------------------------------
-# PARÁMETROS GENERALES
+# Parámetros generales
 # ------------------------------------------
 
-Fs = 1000  # Frecuencia de muestreo
-T = 1      # Duración de la señal
-t = np.linspace(0, T, Fs, endpoint=False)
+fs = 1000  # Frecuencia de muestreo (Hz)
+T = 1      # Duración de la señal (s)
+
+t = np.linspace(0, T, fs, endpoint=False)
 
 # ------------------------------------------
-# 1. SEÑAL SENOIDAL
+# Señal 1: Función senoidal
 # ------------------------------------------
 
-f = 10  # Frecuencia de la señal
+f = 10  # frecuencia de la señal (Hz)
 
-senal_senoidal = np.sin(2*np.pi*f*t)
-
-# Transformada de Fourier
-fft_senoidal = np.fft.fft(senal_senoidal)
-frecuencias = np.fft.fftfreq(len(t), 1/Fs)
+senal_seno = np.sin(2 * np.pi * f * t)
 
 # ------------------------------------------
-# GRAFICAR SEÑAL SENOIDAL
+# Señal 2: Pulso rectangular
 # ------------------------------------------
 
-plt.figure(figsize=(12,5))
+pulso = np.where((t >= 0.4) & (t <= 0.6), 1, 0)
 
-plt.subplot(1,2,1)
-plt.plot(t, senal_senoidal)
-plt.title("Señal Senoidal")
-plt.xlabel("Tiempo (s)")
-plt.ylabel("Amplitud")
+# ------------------------------------------
+# Señal 3: Función escalón
+# ------------------------------------------
 
-plt.subplot(1,2,2)
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_senoidal[:Fs//2]))
-plt.title("Espectro de Frecuencia")
-plt.xlabel("Frecuencia (Hz)")
-plt.ylabel("Magnitud")
+escalon = np.where(t >= 0.5, 1, 0)
+
+# ------------------------------------------
+# Función para calcular FFT
+# ------------------------------------------
+
+def calcular_fft(signal):
+    N = len(signal)
+
+    fft_signal = np.fft.fft(signal)
+
+    frecuencia = np.fft.fftfreq(N, d=1/fs)
+
+    magnitud = np.abs(fft_signal)
+
+    fase = np.angle(fft_signal)
+
+    return frecuencia, magnitud, fase
+
+# FFT de las señales
+
+freq_seno, mag_seno, fase_seno = calcular_fft(senal_seno)
+freq_pulso, mag_pulso, fase_pulso = calcular_fft(pulso)
+freq_escalon, mag_escalon, fase_escalon = calcular_fft(escalon)
+
+# ------------------------------------------
+# Gráficas
+# ------------------------------------------
+
+fig, ax = plt.subplots(3,3, figsize=(15,10))
+
+# Señal Senoidal
+ax[0,0].plot(t, senal_seno)
+ax[0,0].set_title("Señal Senoidal")
+
+ax[0,1].plot(freq_seno, mag_seno)
+ax[0,1].set_title("Magnitud FFT")
+
+ax[0,2].plot(freq_seno, fase_seno)
+ax[0,2].set_title("Fase FFT")
+
+# Pulso Rectangular
+ax[1,0].plot(t, pulso)
+ax[1,0].set_title("Pulso Rectangular")
+
+ax[1,1].plot(freq_pulso, mag_pulso)
+ax[1,1].set_title("Magnitud FFT")
+
+ax[1,2].plot(freq_pulso, fase_pulso)
+ax[1,2].set_title("Fase FFT")
+
+# Escalón
+ax[2,0].plot(t, escalon)
+ax[2,0].set_title("Función Escalón")
+
+ax[2,1].plot(freq_escalon, mag_escalon)
+ax[2,1].set_title("Magnitud FFT")
+
+ax[2,2].plot(freq_escalon, fase_escalon)
+ax[2,2].set_title("Fase FFT")
 
 plt.tight_layout()
 plt.show()
 
 # ------------------------------------------
-# 2. PULSO RECTANGULAR
+# Verificación de Linealidad
 # ------------------------------------------
 
-pulso = signal.square(2*np.pi*5*t)
+senal_combinada = senal_seno + pulso
 
-fft_pulso = np.fft.fft(pulso)
+fft_combinada = np.fft.fft(senal_combinada)
 
-plt.figure(figsize=(12,5))
+fft_suma = np.fft.fft(senal_seno) + np.fft.fft(pulso)
 
-plt.subplot(1,2,1)
-plt.plot(t, pulso)
-plt.title("Pulso Rectangular")
-plt.xlabel("Tiempo (s)")
-
-plt.subplot(1,2,2)
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_pulso[:Fs//2]))
-plt.title("Espectro de Frecuencia")
-plt.xlabel("Frecuencia (Hz)")
-
-plt.tight_layout()
-plt.show()
+print("Propiedad de Linealidad:")
+print(np.allclose(fft_combinada, fft_suma))
 
 # ------------------------------------------
-# 3. FUNCIÓN ESCALÓN
+# Desplazamiento en el tiempo
 # ------------------------------------------
 
-escalon = np.heaviside(t-0.5, 1)
-
-fft_escalon = np.fft.fft(escalon)
-
-plt.figure(figsize=(12,5))
-
-plt.subplot(1,2,1)
-plt.plot(t, escalon)
-plt.title("Función Escalón")
-plt.xlabel("Tiempo (s)")
-
-plt.subplot(1,2,2)
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_escalon[:Fs//2]))
-plt.title("Espectro de Frecuencia")
-plt.xlabel("Frecuencia (Hz)")
-
-plt.tight_layout()
-plt.show()
-
-# ------------------------------------------
-# MAGNITUD Y FASE
-# ------------------------------------------
-
-plt.figure(figsize=(12,6))
-
-plt.subplot(2,1,1)
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_senoidal[:Fs//2]))
-plt.title("Magnitud")
-
-plt.subplot(2,1,2)
-plt.plot(frecuencias[:Fs//2],
-         np.angle(fft_senoidal[:Fs//2]))
-plt.title("Fase")
-
-plt.tight_layout()
-plt.show()
-
-# ------------------------------------------
-# PROPIEDAD DE LINEALIDAD
-# ------------------------------------------
-
-senal1 = np.sin(2*np.pi*10*t)
-senal2 = np.sin(2*np.pi*20*t)
-
-suma = senal1 + senal2
-
-fft_suma = np.fft.fft(suma)
-
-plt.figure(figsize=(10,4))
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_suma[:Fs//2]))
-plt.title("Linealidad: Suma de dos señales")
-plt.xlabel("Frecuencia (Hz)")
-plt.ylabel("Magnitud")
-plt.show()
-
-# ------------------------------------------
-# DESPLAZAMIENTO EN EL TIEMPO
-# ------------------------------------------
-
-senal_desplazada = np.roll(senal_senoidal, 100)
+senal_desplazada = np.roll(senal_seno, 100)
 
 fft_desplazada = np.fft.fft(senal_desplazada)
 
-plt.figure(figsize=(10,4))
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_desplazada[:Fs//2]))
-plt.title("Desplazamiento Temporal")
-plt.xlabel("Frecuencia (Hz)")
-plt.show()
-
 # ------------------------------------------
-# ESCALAMIENTO EN FRECUENCIA
+# Escalamiento en frecuencia
 # ------------------------------------------
 
-senal_escalada = np.sin(2*np.pi*30*t)
+senal_frec2 = np.sin(2 * np.pi * 20 * t)
 
-fft_escalada = np.fft.fft(senal_escalada)
-
-plt.figure(figsize=(10,4))
-plt.plot(frecuencias[:Fs//2],
-         np.abs(fft_escalada[:Fs//2]))
-plt.title("Escalamiento en Frecuencia")
-plt.xlabel("Frecuencia (Hz)")
-plt.show()
+fft_frec2 = np.fft.fft(senal_frec2)
 
 print("Análisis completado correctamente.")
